@@ -1,1 +1,1 @@
-[["p03", "drill", "black"], ["p05", "vacuum", "black"], ["p11", "monitor", "black"], ["p20", "shaver", "black"], ["p26", "grill", "black"]]
+[["p06", "air conditioner", "pink"], ["p13", "screwdriver", "pink"]]

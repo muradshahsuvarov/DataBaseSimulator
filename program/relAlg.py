@@ -1,26 +1,6 @@
 import json
 import os
-
-
-def load_schema(rel):
-    # Load the schema from the root data directory
-    schema_path = '../data/schemas.txt'
-    with open(schema_path, 'r') as schema_file:
-        schema = json.load(schema_file)
-    # Create a dictionary to map attribute names to their positions
-    schema_dict = {attr[1]: attr[3] for attr in schema if attr[0] == rel}
-    return schema_dict
-
-
-def check_bplus_tree_exists(rel, att):
-    directory_path = '../index/directory.txt'
-    with open(directory_path, 'r') as directory_file:
-        directory = json.load(directory_file)
-    # Search for a B+ tree for the given relation and attribute
-    for entry in directory:
-        if entry[0] == rel and entry[1] == att:
-            return entry[2]  # Return the root if a B+ tree exists
-    return None
+import utility
 
 
 def select(rel, att, op, val):
@@ -28,7 +8,7 @@ def select(rel, att, op, val):
     pages_read = 0  # Count the number of pages read
     pages_path = f'../data/{rel}'  # Assuming the directory structure from the project description
     page_link_path = os.path.join(pages_path, 'pageLink.txt')
-    schema_dict = load_schema(rel)  # Load the schema for the relation
+    schema_dict = utility.load_schema(rel)  # Load the schema for the relation
 
     # Check if the attribute is in the schema
     if att not in schema_dict:
@@ -38,7 +18,7 @@ def select(rel, att, op, val):
     att_index = schema_dict[att]
 
     # Check for B+_tree existence
-    bplus_tree_root = check_bplus_tree_exists(rel, att)
+    bplus_tree_root = utility.check_bplus_tree_exists(rel, att)
     if bplus_tree_root:
         # TODO: Implement search using B+_tree
         print(f"With B+_tree, the cost of searching {att} {op} {val} on {rel} is {pages_read} pages")
