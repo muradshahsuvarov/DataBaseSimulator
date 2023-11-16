@@ -1,60 +1,67 @@
-import math
-import utility
 import json
+import os
+import math
+from utility import load_schema, count_records, BPlusTree
 
+
+# Assuming utility.py has necessary functions like count_records and load_schema
 
 def build(rel, att, od):
-
-    # Step 1: Get total number of all records from relation named rel
-    total_records = utility.count_records(rel)
-
-    # Step 2: Calculate the height and the fanout of the tree
-    # The fanout is 2 * od + 1 in our case
-    fanout = (2 * od + 1)
-    height = math.ceil(math.log((total_records / fanout - 1), (fanout + 1)))
-
-    # Step 3: Start building a balanced B+ tree
-    # Check if the attribute is in the schema
-    schema_dict = utility.load_schema(rel)
+    # Load the schema to find the index of the attribute
+    schema_dict = load_schema(rel)
     if att not in schema_dict:
         raise ValueError(f"Attribute {att} not found in schema for relation {rel}")
+    att_index = schema_dict[att]
 
-    # Initialize the root of the B+ tree
-    root = {
-        'page_name': '',
-        'type': 'I',
-        'parent': 'nil',
-        'children': []
-    }
+    # Step 1: Get total number of all records from relation named rel
+    total_records = count_records(rel)
 
-    # Path to the page pool
+    # Step 2: Retrieve the list of attributes and page names
+    attribute_list = []
+    pages_path = f'../data/{rel}'
+    page_link_path = os.path.join(pages_path, 'pageLink.txt')
+
+    with open(page_link_path, 'r') as link_file:
+        page_order = json.load(link_file)
+
+    for page_file in page_order:
+        with open(os.path.join(pages_path, page_file), 'r') as file:
+            page_data = json.load(file)
+            for index, record in enumerate(page_data):
+                attribute_list.append((record[att_index], page_file, index))
+
+    # Step 3: Parse the list of available page names from the page pool
     page_pool_path = '../index/pagePool.txt'
-
-    # Read the available pages from the page pool
     with open(page_pool_path, 'r') as page_pool_file:
         page_pool = json.load(page_pool_file)
 
-    # Take a page from the end of the page pool to use as the root
-    if page_pool:
-        root['page_name'] = page_pool.pop()  # Get the last page in the pool
-    else:
-        raise Exception("No pages available in the page pool.")
+        # Check if there are enough pages in the page pool
+        if len(page_pool) == 0:
+            return "Can't create a B+ Tree because the page pool is empty"
+        elif total_records / (2 * od) > len(page_pool):
+            return "Not enough available pages to create a B+ tree for {rel} relation"
+
+    # Initialize the B+ tree structure
+    bPlusTree = BPlusTree(od, page_pool)
+
+    # Insert attributes into the B+ tree
+    for attribute, page_name, index in attribute_list:
+        bPlusTree.insert(attribute, page_name, index)
+    bPlusTree.remove_duplicate_nodes()
 
     # Write the updated page pool back to the file
-    with open(page_pool_path, 'w') as page_pool_file:
-        json.dump(page_pool, page_pool_file)
+    # with open(page_pool_path, 'w') as page_pool_file:
+        # json.dump(page_pool, page_pool_file)
 
-    # TODO: Build the B+ tree by inserting records into the tree
-    # This will involve creating pages for leaf nodes and internal nodes,
-    # distributing keys and pointers according to B+ tree properties,
-    # and handling splits and merges as you insert records.
+    # Save the tree structure to files
+    # You would need to iterate over the tree dictionary
+    # and save each node to a corresponding .txt file in the index folder.
 
-    # Save the structure of the newly created B+ tree
-    # TODO: Save the root and all other pages to files in the index folder
-    # TODO: Update the directory.txt with the new B+ tree's root page information
+    # Update directory.txt
+    # Add the new B+ tree information to directory.txt
 
-    # Return a reference to the root page of the constructed B+ tree
-    return height
+    # Return the B+ tree or the root node reference
+    return bPlusTree
 
 
 def removeTable(rel):
