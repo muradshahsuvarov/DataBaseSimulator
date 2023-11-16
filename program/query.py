@@ -1,7 +1,9 @@
 import relAlg
 import buildTree
+from utility import BPlusTree
 
 if __name__ == '__main__':
-    bTree = buildTree.build("Products", "pid", 1)
-    bTree.display()
+    root = buildTree.build("Suppliers", "sid", 1)
+    BPlusTree.display(root)
+
     # relAlg.build("Products", "color", "==", "pink")

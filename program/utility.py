@@ -184,7 +184,8 @@ class BPlusTree:
         value = (attribute, page_name, index)
         self.insert_into_tree(value)
 
-    def display(self):
+    @staticmethod
+    def display(root_node):
         def display_node(node, indent=0):
             if node is None:
                 return
@@ -206,4 +207,4 @@ class BPlusTree:
                 leaf_info += entries_info + "]"
                 print(leaf_info)
 
-        display_node(self.root)
+        display_node(root_node)
