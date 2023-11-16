@@ -45,9 +45,9 @@ def build(rel, att, od):
     bPlusTree = BPlusTree(od, page_pool)
 
     # Insert attributes into the B+ tree
+    counter = 0
     for attribute, page_name, index in attribute_list:
         bPlusTree.insert(attribute, page_name, index)
-    bPlusTree.remove_duplicate_nodes()
 
     # Write the updated page pool back to the file
     # with open(page_pool_path, 'w') as page_pool_file:

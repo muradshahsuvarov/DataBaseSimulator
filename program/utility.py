@@ -207,33 +207,3 @@ class BPlusTree:
                 print(leaf_info)
 
         display_node(self.root)
-
-    def remove_duplicate_nodes(self):
-        def traverse_and_remove(node, seen_nodes):
-            if node is None:
-                return
-
-            # Check if the node (leaf or internal) is a duplicate
-            if node.name in seen_nodes:
-                # Find and remove the duplicate entry in the parent
-                for i, entry in enumerate(node.parent.body):
-                    if entry.left_child == node or entry.right_child == node:
-                        del node.parent.body[i]
-                        node.parent.current_keys -= 1
-                        break
-            else:
-                seen_nodes.add(node.name)
-                if node.type == 'I':
-                    for entry in node.body:
-                        traverse_and_remove(entry.left_child, seen_nodes)
-                        traverse_and_remove(entry.right_child, seen_nodes)
-
-        # Start the traversal from the root
-        seen_nodes = set()
-        traverse_and_remove(self.root, seen_nodes)
-
-        # Handle the case where root might have become empty after removals
-        if self.root.current_keys == 0 and self.root.type == 'I':
-            if self.root.body[0].left_child:
-                self.root = self.root.body[0].left_child
-                self.root.parent = 'nil'
