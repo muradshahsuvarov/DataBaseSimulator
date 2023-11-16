@@ -45,7 +45,6 @@ def build(rel, att, od):
     bPlusTree = BPlusTree(od, page_pool)
 
     # Insert attributes into the B+ tree
-    counter = 0
     for attribute, page_name, index in attribute_list:
         bPlusTree.insert(attribute, page_name, index)
 
@@ -61,7 +60,7 @@ def build(rel, att, od):
     # Add the new B+ tree information to directory.txt
 
     # Return the B+ tree or the root node reference
-    return bPlusTree
+    return bPlusTree.root
 
 
 def removeTable(rel):
