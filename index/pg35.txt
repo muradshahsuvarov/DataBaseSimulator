@@ -1,0 +1,14 @@
+{
+    "name": "pg35.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 1,
+    "parent": "pg31.txt",
+    "body": [
+        {
+            "key": "s06",
+            "left_child": "pg40.txt",
+            "right_child": "pg44.txt"
+        }
+    ]
+}

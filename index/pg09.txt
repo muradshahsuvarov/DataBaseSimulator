@@ -1,0 +1,14 @@
+{
+    "name": "pg09.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 1,
+    "parent": "pg13.txt",
+    "body": [
+        {
+            "key": "s06",
+            "left_child": "pg07.txt",
+            "right_child": "pg08.txt"
+        }
+    ]
+}

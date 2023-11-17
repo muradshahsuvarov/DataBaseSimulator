@@ -72,5 +72,38 @@ def build(rel, att, od):
     # Save the tree structure to files
     BPlusTree.save(bPlusTree.root)
 
+    # Serialize the entire B+ tree
+    def serialize_tree(node):
+        if node is None:
+            return None
+
+        tree_data = {
+            'name': node.name,
+            'type': node.type,
+            'capacity': node.capacity,
+            'current_keys': node.current_keys,
+            'parent': node.parent.name if node.parent and hasattr(node.parent, 'name') else None
+        }
+
+        if node.type == 'L':
+            tree_data.update({
+                'leftNode': node.leftNode.name if node.leftNode else None,
+                'rightNode': node.rightNode.name if node.rightNode else None,
+                'body': node.body
+            })
+        else:
+            tree_data['body'] = [serialize_tree(entry.left_child) for entry in node.body] + \
+                                [serialize_tree(entry.right_child) for entry in node.body]
+
+        return tree_data
+
+    # Ensure the directory exists
+    os.makedirs('../generatedTrees/', exist_ok=True)
+
+    # Save the serialized tree to a file
+    tree_file_path = f'../generatedTrees/{rel}.{att}.txt'
+    with open(tree_file_path, 'w') as tree_file:
+        json.dump(serialize_tree(bPlusTree.root), tree_file, indent=4)
+
     # Return the B+ tree or the root node reference
     return bPlusTree.root

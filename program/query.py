@@ -1,5 +1,6 @@
 import relAlg
 import buildTree
+import remove
 from utility import BPlusTree
 
 if __name__ == '__main__':

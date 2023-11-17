@@ -1,0 +1,16 @@
+{
+    "name": "pg07.txt",
+    "type": "L",
+    "capacity": 2,
+    "current_keys": 1,
+    "parent": "pg09.txt",
+    "leftNode": "pg04.txt",
+    "rightNode": "pg08.txt",
+    "body": [
+        [
+            "s05",
+            "page02.txt",
+            0
+        ]
+    ]
+}
