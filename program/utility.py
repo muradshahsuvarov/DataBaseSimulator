@@ -57,8 +57,8 @@ class Node:
 class LeafNode(Node):
     def __init__(self, name, parent, capacity):
         super().__init__(name, 'L', parent, capacity)
-        self.leftNode = 'nil'
-        self.rightNode = 'nil'
+        self.leftNode = None
+        self.rightNode = None
 
 
 class InternalNodeEntry:
@@ -135,7 +135,7 @@ class BPlusTree:
             node.body = node.body[:mid_index]
             node.current_keys = len(node.body)
 
-            if node.rightNode != 'nil':
+            if node.rightNode is not None:
                 node.rightNode.leftNode = new_node
             new_node.rightNode = node.rightNode
             new_node.leftNode = node
@@ -208,3 +208,209 @@ class BPlusTree:
                 print(leaf_info)
 
         display_node(root_node)
+
+    def remove(self, attribute):
+        # Find the leaf node containing the attribute
+        leaf_node = self.find_leaf_node(attribute)
+
+        # Check whether removing the element would cause the underflow
+        leaf_node.current_keys -= 1
+
+        # Check if the leaf node is under capacity
+        if leaf_node.current_keys < self.order:
+            self.handle_underflow(leaf_node)
+        else:
+            # Remove the attribute from the leaf node
+            leaf_node.body = [item for item in leaf_node.body if item[0] != attribute]
+
+    def handle_underflow(self, leaf_node):
+        if leaf_node.leftNode and leaf_node.leftNode.current_keys - 1 > self.order:
+            self.borrow_from_left(leaf_node)
+        elif leaf_node.rightNode and leaf_node.rightNode.current_keys - 1 > self.order:
+            self.borrow_from_right(leaf_node)
+        else:
+            self.merge_leaf(leaf_node)
+
+    def borrow_from_left(self, leaf_node):
+        left_sibling = leaf_node.leftNode
+        parent = leaf_node.parent
+
+        # Borrow the last entry from the left sibling
+        borrowed_entry = left_sibling.body.pop()
+        leaf_node.body.insert(0, borrowed_entry)
+        leaf_node.current_keys += 1
+        left_sibling.current_keys -= 1
+
+        # Update the parent's key
+        for entry in parent.body:
+            if entry.right_child == leaf_node:
+                entry.key = leaf_node.body[0][0]
+                break
+
+    def borrow_from_right(self, leaf_node):
+        right_sibling = leaf_node.rightNode
+        parent = leaf_node.parent
+
+        # Borrow the first entry from the right sibling
+        borrowed_entry = right_sibling.body.pop(0)
+        leaf_node.body.append(borrowed_entry)
+        leaf_node.current_keys += 1
+        right_sibling.current_keys -= 1
+
+        # Update the parent's key
+        for entry in parent.body:
+            if entry.left_child == leaf_node:
+                entry.key = right_sibling.body[0][0]
+                break
+
+    def merge_leaf(self, leaf_node):
+        parent = leaf_node.parent
+        left_sibling = leaf_node.leftNode
+        right_sibling = leaf_node.rightNode
+
+        # Determine which sibling to merge with
+        merge_with = left_sibling if left_sibling else right_sibling
+        is_left_merge = left_sibling is not None
+
+        # Merge sibling's entries into leaf_node
+        if is_left_merge:
+            # Merge all items from the left sibling into leaf_node
+            leaf_node.body = merge_with.body + leaf_node.body[1:]
+            leaf_node.leftNode = merge_with.leftNode
+            if merge_with.leftNode:
+                merge_with.leftNode.rightNode = leaf_node
+        else:
+            # Merge all items from the right sibling into leaf_node
+            leaf_node.body = leaf_node.body[:-1] + merge_with.body
+            leaf_node.rightNode = merge_with.rightNode
+            if merge_with.rightNode:
+                merge_with.rightNode.leftNode = leaf_node
+
+        leaf_node.current_keys = len(leaf_node.body)
+
+        # Update the parent's entry to point to leaf_node and remove the redundant entry
+        for e in parent.body:
+            if is_left_merge and e.right_child == merge_with:
+                e.right_child = leaf_node
+            elif not is_left_merge and e.left_child == merge_with:
+                e.left_child = leaf_node
+
+        parent.body = [e for e in parent.body if e.left_child != merge_with and e.right_child != merge_with]
+        parent.current_keys = len(parent.body)
+
+        # Handle potential underflow in the parent
+        if parent.current_keys < self.order:
+            self.handle_internal_node_underflow(parent)
+
+    def handle_internal_node_underflow(self, node):
+        if node == self.root:
+            # Handle the special case where the root is the underflow node
+            if node.current_keys == 0 and node.body[0].left_child:
+                self.root = node.body[0].left_child
+                self.root.parent = 'nil'
+            return
+
+        parent = node.parent
+        left_sibling = self.find_left_sibling(node)
+        right_sibling = self.find_right_sibling(node)
+
+        if left_sibling and left_sibling.current_keys - 1 >= self.order:
+            self.borrow_from_left_internal(node, left_sibling)
+        elif right_sibling and right_sibling.current_keys - 1 >= self.order:
+            self.borrow_from_right_internal(node, right_sibling)
+        else:
+            self.merge_internal(node, left_sibling if left_sibling else right_sibling)
+
+    def find_left_sibling(self, node):
+        # Find the left sibling of the node
+        parent = node.parent
+        for i, entry in enumerate(parent.body):
+            if entry.right_child == node and i > 0:
+                return parent.body[i - 1].left_child
+        return None
+
+    def find_right_sibling(self, node):
+        # Find the right sibling of the node
+        parent = node.parent
+        for i, entry in enumerate(parent.body):
+            if entry.left_child == node and i < len(parent.body) - 1:
+                return parent.body[i + 1].right_child
+        return None
+
+    def borrow_from_left_internal(self, node, left_sibling):
+        parent = node.parent
+
+        # Borrow the last entry from left_sibling
+        borrowed_entry = left_sibling.body.pop()
+        left_sibling.current_keys -= 1
+
+        # Insert the borrowed entry into the start of the node
+        # and move the parent's key down
+        node.body.insert(0, InternalNodeEntry(parent.body[0].key, borrowed_entry.right_child, node.body[0].left_child))
+        parent.body[0].key = borrowed_entry.key
+        node.current_keys += 1
+
+        # Update child node's parent pointers
+        if borrowed_entry.right_child:
+            borrowed_entry.right_child.parent = node
+
+
+    def borrow_from_right_internal(self, node, right_sibling):
+        parent = node.parent
+
+        # Borrow the first entry from right_sibling
+        borrowed_entry = right_sibling.body.pop(0)
+        right_sibling.current_keys -= 1
+
+        # Insert the borrowed entry into the end of the node
+        # and move the parent's key down
+        node.body.append(InternalNodeEntry(parent.body[-1].key, node.body[-1].right_child, borrowed_entry.left_child))
+        parent.body[-1].key = borrowed_entry.key
+        node.current_keys += 1
+
+        # Update child node's parent pointers
+        if borrowed_entry.left_child:
+            borrowed_entry.left_child.parent = node
+
+
+    def merge_internal(self, node, sibling):
+        if sibling is None:
+            # No sibling to merge with, should not typically happen, but handle gracefully
+            return
+
+        parent = node.parent
+        is_left_merge = sibling.body[0].key < node.body[0].key if sibling.body and node.body else False
+
+        # Merge node with its sibling
+        merge_with = sibling if is_left_merge else node
+        merge_into = node if is_left_merge else sibling
+
+        # Move the parent's key down and merge entries
+        parent_key_index = parent.body.index(next(e for e in parent.body if e.left_child == merge_with or e.right_child == merge_with))
+        parent_key = parent.body[parent_key_index].key
+        if is_left_merge:
+            merge_into.body.append(InternalNodeEntry(parent_key, merge_with.body[-1].right_child, merge_into.body[0].left_child))
+            merge_into.body = merge_with.body + merge_into.body
+        else:
+            merge_into.body.insert(0, InternalNodeEntry(parent_key, merge_into.body[-1].right_child, merge_with.body[0].left_child))
+            merge_into.body += merge_with.body
+
+        # Update current keys count
+        merge_into.current_keys = len(merge_into.body)
+
+        # Remove the merge_with node and the corresponding key from the parent
+        parent.body.pop(parent_key_index)
+        parent.current_keys -= 1
+
+        # Update child node's parent pointers
+        for entry in merge_with.body:
+            if entry.left_child:
+                entry.left_child.parent = merge_into
+            if entry.right_child:
+                entry.right_child.parent = merge_into
+
+        # Handle potential underflow in the parent
+        if parent.current_keys < self.order:
+            self.handle_internal_node_underflow(parent)
+
+
