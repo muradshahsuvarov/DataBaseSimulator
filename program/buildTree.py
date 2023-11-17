@@ -4,8 +4,6 @@ import math
 from utility import load_schema, count_records, BPlusTree
 
 
-# Assuming utility.py has necessary functions like count_records and load_schema
-
 def build(rel, att, od):
     # Load the schema to find the index of the attribute
     schema_dict = load_schema(rel)
@@ -45,25 +43,34 @@ def build(rel, att, od):
     bPlusTree = BPlusTree(od, page_pool)
 
     # Insert attributes into the B+ tree
-    counter = 0
     for attribute, page_name, index in attribute_list:
-        if counter < 4:
-            bPlusTree.insert(attribute, page_name, index)
-            counter = counter + 1
-        else:
-            break
-    bPlusTree.remove("s02")
+        bPlusTree.insert(attribute, page_name, index)
 
-    # Write the updated page pool back to the file
-    # with open(page_pool_path, 'w') as page_pool_file:
-        # json.dump(page_pool, page_pool_file)
+    # Save the B+ tree root information in the directory
+    directory_path = '../index/directory.txt'
+    new_entry = (rel, att, bPlusTree.root.name)
+
+    # Read the existing directory entries
+    with open(directory_path, 'r') as directory_file:
+        try:
+            directory_entries = json.load(directory_file)
+        except json.JSONDecodeError:  # In case the file is empty or invalid JSON
+            directory_entries = []
+
+    # Append the new entry
+    directory_entries.append(new_entry)
+
+    # Write the updated list of entries back to the file in JSON format
+    with open(directory_path, 'w') as directory_file:
+        json.dump(directory_entries, directory_file, indent=4)
+
+    # Save the updated page pool back to the file in JSON format
+    page_pool_path = '../index/pagePool.txt'
+    with open(page_pool_path, 'w') as page_pool_file:
+        json.dump(page_pool, page_pool_file, indent=4)
 
     # Save the tree structure to files
-    # You would need to iterate over the tree dictionary
-    # and save each node to a corresponding .txt file in the index folder.
-
-    # Update directory.txt
-    # Add the new B+ tree information to directory.txt
+    BPlusTree.save(bPlusTree.root)
 
     # Return the B+ tree or the root node reference
     return bPlusTree.root

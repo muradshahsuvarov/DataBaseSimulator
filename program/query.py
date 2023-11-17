@@ -6,4 +6,4 @@ if __name__ == '__main__':
     root = buildTree.build("Suppliers", "sid", 1)
     BPlusTree.display(root)
 
-    # relAlg.build("Products", "color", "==", "pink")
+    # relAlg.select("Products", "color", "==", "pink")

@@ -413,4 +413,45 @@ class BPlusTree:
         if parent.current_keys < self.order:
             self.handle_internal_node_underflow(parent)
 
+    @staticmethod
+    def save(node, folder_path='../index/'):
+        if node is None:
+            return
+
+        # Serialize node data
+        node_data = {
+            'name': node.name,
+            'type': node.type,
+            'capacity': node.capacity,
+            'current_keys': node.current_keys,
+            'parent': node.parent.name if node.parent and hasattr(node.parent, 'name') else None
+        }
+
+        if node.type == 'L':
+            node_data['leftNode'] = node.leftNode.name if node.leftNode else None
+            node_data['rightNode'] = node.rightNode.name if node.rightNode else None
+            node_data['body'] = node.body
+        else:
+            # For InternalNode, serialize each entry in the body
+            node_data['body'] = []
+            for entry in node.body:
+                entry_data = {
+                    'key': entry.key,
+                    'left_child': entry.left_child.name if entry.left_child else None,
+                    'right_child': entry.right_child.name if entry.right_child else None
+                }
+                node_data['body'].append(entry_data)
+
+        # Save node data to file
+        file_path = os.path.join(folder_path, f"{node.name}")
+        with open(file_path, 'w') as file:
+            json.dump(node_data, file, indent=4)
+
+        # Recursively save child nodes (for internal nodes)
+        if node.type == 'I':
+            for entry in node.body:
+                BPlusTree.save(entry.left_child, folder_path)
+                BPlusTree.save(entry.right_child, folder_path)
+
+
 
