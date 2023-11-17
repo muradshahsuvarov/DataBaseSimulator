@@ -2,48 +2,70 @@ import json
 import os
 
 
+import os
+
 def removeTree(rel, att):
-    tree_file_path = f'../generatedTrees/{rel}.{att}.txt'
+    # Step 1: Read directory data and find root page
     directory_path = '../index/directory.txt'
-    page_pool_path = '../index/pagePool.txt'
+    with open(directory_path, 'r') as file:
+        directory_entries = json.load(file)
 
-    # Check if the tree file exists
-    if not os.path.exists(tree_file_path):
-        return "B+ tree does not exist."
+    root_page_name = None
+    for entry in directory_entries:
+        if entry[0] == rel and entry[1] == att:
+            root_page_name = entry[2]
+            break
 
-    # Deserialize the tree and collect page names
-    with open(tree_file_path, 'r') as tree_file:
-        tree_data = json.load(tree_file)
+    if not root_page_name:
+        return "B+ Tree does not exist for the specified relation and attribute."
 
-    def collect_pages(node_data):
-        if node_data is None:
-            return []
-        pages = [node_data['name']]
+    # Step 2: Remove the tree entry from the directory
+    new_directory_entries = [entry for entry in directory_entries if entry[2] != root_page_name]
+    with open(directory_path, 'w') as file:
+        json.dump(new_directory_entries, file, indent=4)
+
+    # Step 3: Traverse the tree and collect node names
+    def traverse_and_collect(node_name, collected_nodes=[]):
+        file_path = os.path.join('../index/', node_name)
+        with open(file_path, 'r') as file:
+            node_data = json.load(file)
+
+        collected_nodes.append(node_data['name'])
+
         if node_data['type'] == 'I':
-            for child in node_data['body']:
-                pages += collect_pages(child)
-        return pages
+            for entry in node_data['body']:
+                if entry['left_child']:
+                    traverse_and_collect(entry['left_child'], collected_nodes)
+                if entry['right_child']:
+                    traverse_and_collect(entry['right_child'], collected_nodes)
 
-    pages_to_return = collect_pages(tree_data)
+    nodes_to_remove = []
+    traverse_and_collect(root_page_name, nodes_to_remove)
 
-    # Remove tree file
-    os.remove(tree_file_path)
+    # Step 4: Remove page files from the index directory
+    for node_name in nodes_to_remove:
+        file_path = os.path.join('../index/', f"{node_name}")
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
-    # Update directory
-    with open(directory_path, 'r') as directory_file:
-        directory_entries = json.load(directory_file)
-    directory_entries = [entry for entry in directory_entries if not (entry[0] == rel and entry[1] == att)]
-    with open(directory_path, 'w') as directory_file:
-        json.dump(directory_entries, directory_file, indent=4)
+    # Step 5: Update page pool
+    page_pool_path = '../index/pagePool.txt'
+    with open(page_pool_path, 'r') as file:
+        page_pool = json.load(file)
 
-    # Update page pool
-    with open(page_pool_path, 'r') as page_pool_file:
-        page_pool = json.load(page_pool_file)
-    page_pool.extend(pages_to_return)
-    with open(page_pool_path, 'w') as page_pool_file:
-        json.dump(page_pool, page_pool_file, indent=4)
+    page_pool.extend(nodes_to_remove)
 
-    return "B+ tree removed successfully."
+    with open(page_pool_path, 'w') as file:
+        json.dump(page_pool, file, indent=4)
+
+    return "B+ Tree removed successfully."
+
+
+    with open(page_pool_path, 'w') as file:
+        json.dump(page_pool, file, indent=4)
+
+    return "B+ Tree removed successfully."
+
 
 
 def removeTable(rel):
