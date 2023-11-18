@@ -1,7 +1,144 @@
 import json
 import os
 import re
-import sys
+
+
+def initialize_bplus_tree(root_file_name):
+    previous_leaf = None  # Variable to keep track of the previous leaf node
+
+    def reconstruct_node(file_name, is_leaf=False):
+        nonlocal previous_leaf
+        if not file_name:
+            return None
+        file_path = os.path.join('../index/', file_name)
+        with open(file_path, 'r') as file:
+            node_data = json.load(file)
+
+        if node_data['type'] == 'L':
+            node = LeafNode(node_data['name'], None, node_data['capacity'])
+            node.body = node_data['body']
+            if previous_leaf:
+                previous_leaf.rightNode = node  # Link previous leaf's rightNode to current leaf
+                node.leftNode = previous_leaf  # Link current leaf's leftNode to previous leaf
+            previous_leaf = node  # Update previous leaf to current node
+        else:
+            node = InternalNode(node_data['name'], None, node_data['capacity'])
+            for entry in node_data['body']:
+                left_child = reconstruct_node(entry['left_child'])
+                right_child = reconstruct_node(entry['right_child'])
+                node_entry = InternalNodeEntry(entry['key'], left_child, right_child)
+                node.body.append(node_entry)
+
+        return node
+
+    return reconstruct_node(root_file_name, is_leaf=True)
+
+
+def traverse_bplus_tree(root, op, val, pages_read):
+    relevant_leaves = []
+    node = root  # Start from the root of the tree
+
+    # Function to parse the key into a comparable format
+    def parse_key(key):
+        if isinstance(key, (int, float)):
+            return key
+        match = re.search(r'\d+', key)
+        return int(match.group()) if match else float('inf')
+
+    # Function to compare values based on the operation
+    def compare(key_val, op, search_val):
+        if op == '=':
+            return key_val == search_val
+        elif op == '<':
+            return key_val < search_val
+        elif op == '<=':
+            return key_val <= search_val
+        elif op == '>':
+            return key_val > search_val
+        elif op == '>=':
+            return key_val >= search_val
+
+    val = parse_key(val)  # Ensure the search value is parsed
+
+    # Traverse the tree to find relevant leaves
+    while node:
+        print(node.name)
+        pages_read += 1  # Increment page count when a new node is visited
+        if node.type == 'L':
+            # For leaf nodes, check if records satisfy the condition
+            for record in node.body:
+                record_val = parse_key(record[0])
+                if compare(record_val, op, val):
+                    relevant_leaves.append(node)
+                    break  # Break after finding the first matching record for '='
+            if op == '=':
+                break
+            # For range queries, check adjacent nodes
+            if op in ['<', '<='] and node.leftNode:
+                node = node.leftNode
+            elif op in ['>', '>='] and node.rightNode:
+                node = node.rightNode
+            else:
+                break  # No adjacent node to traverse for the current operation
+        else:  # Handling for internal nodes
+            for i, entry in enumerate(node.body):
+                entry_val = parse_key(entry.key)
+                if op in ['<', '<=']:
+                    if val == entry_val:
+                        node = entry.left_child
+                        break
+                    elif i < len(node.body) - 1:
+                        if val > parse_key(node.body[i + 1].key):
+                            node = node.body[i + 1].right_child
+                            break
+                        elif val < parse_key(node.body[i + 1].key):
+                            node = entry.right_child
+                            break
+                    else:
+                        if val > entry_val:
+                            node = entry.right_child
+                            break
+                        elif val < entry_val:
+                            node = entry.left_child
+                            break
+                elif op in ['>', '>='] and val >= entry_val:
+                    node = entry.right_child
+                    break
+                elif op in ['>', '>='] and val < entry_val:
+                    node = entry.left_child
+                    break
+                elif (op == '=') and (i == 0 or val >= parse_key(node.body[i - 1].key)) and \
+                        (i == len(node.body) - 1 or val < entry_val):
+                    node = entry.left_child
+                    break
+            else:
+                if op == '=' and node.body:
+                    node = node.body[-1].right_child
+                else:
+                    break
+
+    return relevant_leaves, pages_read
+
+
+
+def read_page_data(rel, page_file):
+    file_path = os.path.join(f'../data/{rel}', page_file)
+    with open(file_path, 'r') as file:
+        return json.load(file)
+
+
+def satisfies_condition(record_val, op, val):
+    if op == '=':
+        return record_val == val
+    elif op == '<':
+        return record_val < val
+    elif op == '<=':
+        return record_val <= val
+    elif op == '>':
+        return record_val > val
+    elif op == '>=':
+        return record_val >= val
+    return False
 
 
 def count_records(rel):
@@ -75,7 +212,16 @@ class InternalNode(Node):
     def add_entry(self, key, left_child, right_child):
         entry = InternalNodeEntry(key, left_child, right_child)
         self.body.append(entry)
-        self.body.sort(key=lambda item: int(re.search(r'\d+', entry.key).group()))
+        self.body.sort(key=lambda item: self.parse_key(item.key))
+
+    @staticmethod
+    def parse_key(key):
+        # If the key is already a numeric type, return as is
+        if isinstance(key, (int, float)):
+            return key
+        # If the key is a string, extract the numeric part
+        match = re.search(r'\d+', key)
+        return int(match.group()) if match else float('inf')
 
 
 class BPlusTree:
@@ -94,18 +240,26 @@ class BPlusTree:
     def find_leaf_node(self, attribute):
         node = self.root
 
-        attr_num = int(re.search(r'\d+', attribute).group())  # Extract the numeric part of the attribute
+        # Function to extract the numeric part of the key
+        def extract_numeric_part(key):
+            if isinstance(key, (int, float)):
+                return key
+            match = re.search(r'\d+', key)
+            return int(match.group()) if match else None
+
+        # Extract the numeric part of the attribute
+        attr_num = extract_numeric_part(attribute)
 
         while node.type != 'L':  # Continue until a leaf node is reached
             found = False
             for entry in node.body:
-                entry_key_num = int(re.search(r'\d+', entry.key).group())  # Numeric part of the entry's key
+                entry_key_num = extract_numeric_part(entry.key)
 
-                if attr_num < entry_key_num:
+                if entry_key_num is not None and attr_num < entry_key_num:
                     node = entry.left_child
                     found = True
                     break
-                elif attr_num >= entry_key_num:
+                elif entry_key_num is not None and attr_num >= entry_key_num:
                     continue
 
             # This is to handle the case where attr_num is greater than all keys in the node
@@ -117,9 +271,19 @@ class BPlusTree:
     def insert_into_tree(self, value):
         attribute, page_name, index = value
         leaf_node = self.find_leaf_node(attribute)
+
+        # Function to extract the numeric part for sorting
+        def extract_sort_key(item):
+            key = item[0]
+            if isinstance(key, (int, float)):
+                return key
+            match = re.search(r'\d+', key)
+            return int(match.group()) if match else None
+
         leaf_node.body.append((attribute, f"{page_name}", index))
-        leaf_node.body.sort(key=lambda x: int(re.search(r'\d+', x[0]).group()))  # Sort by numeric part of attribute
+        leaf_node.body.sort(key=extract_sort_key)  # Sort using the numeric part of attribute
         leaf_node.current_keys += 1
+
         if leaf_node.current_keys > leaf_node.capacity:
             self.split_node(leaf_node)
 
@@ -173,7 +337,16 @@ class BPlusTree:
             if parent_update_required:
                 new_entry = InternalNodeEntry(mid_value, node, new_node)
                 node.parent.body.append(new_entry)
-                node.parent.body.sort(key=lambda item: int(re.search(r'\d+', item.key).group()))
+
+                # Function to extract the numeric part for sorting
+                def extract_sort_key(item):
+                    key = item.key
+                    if isinstance(key, (int, float)):
+                        return key
+                    match = re.search(r'\d+', key)
+                    return int(match.group()) if match else None
+
+                node.parent.body.sort(key=extract_sort_key)  # Sort using the numeric part of the key
                 node.parent.current_keys += 1
 
             if node.parent.current_keys > node.parent.capacity:
@@ -354,7 +527,6 @@ class BPlusTree:
         if borrowed_entry.right_child:
             borrowed_entry.right_child.parent = node
 
-
     def borrow_from_right_internal(self, node, right_sibling):
         parent = node.parent
 
@@ -372,7 +544,6 @@ class BPlusTree:
         if borrowed_entry.left_child:
             borrowed_entry.left_child.parent = node
 
-
     def merge_internal(self, node, sibling):
         if sibling is None:
             # No sibling to merge with, should not typically happen, but handle gracefully
@@ -386,13 +557,16 @@ class BPlusTree:
         merge_into = node if is_left_merge else sibling
 
         # Move the parent's key down and merge entries
-        parent_key_index = parent.body.index(next(e for e in parent.body if e.left_child == merge_with or e.right_child == merge_with))
+        parent_key_index = parent.body.index(
+            next(e for e in parent.body if e.left_child == merge_with or e.right_child == merge_with))
         parent_key = parent.body[parent_key_index].key
         if is_left_merge:
-            merge_into.body.append(InternalNodeEntry(parent_key, merge_with.body[-1].right_child, merge_into.body[0].left_child))
+            merge_into.body.append(
+                InternalNodeEntry(parent_key, merge_with.body[-1].right_child, merge_into.body[0].left_child))
             merge_into.body = merge_with.body + merge_into.body
         else:
-            merge_into.body.insert(0, InternalNodeEntry(parent_key, merge_into.body[-1].right_child, merge_with.body[0].left_child))
+            merge_into.body.insert(0, InternalNodeEntry(parent_key, merge_into.body[-1].right_child,
+                                                        merge_with.body[0].left_child))
             merge_into.body += merge_with.body
 
         # Update current keys count
@@ -452,6 +626,3 @@ class BPlusTree:
             for entry in node.body:
                 BPlusTree.save(entry.left_child, folder_path)
                 BPlusTree.save(entry.right_child, folder_path)
-
-
-

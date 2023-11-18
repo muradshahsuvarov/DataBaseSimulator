@@ -1,0 +1,21 @@
+{
+    "name": "pg979.txt",
+    "type": "L",
+    "capacity": 2,
+    "current_keys": 2,
+    "parent": "pg895.txt",
+    "leftNode": "pg980.txt",
+    "rightNode": "pg886.txt",
+    "body": [
+        [
+            32.61,
+            "page09.txt",
+            0
+        ],
+        [
+            35.53,
+            "page52.txt",
+            1
+        ]
+    ]
+}

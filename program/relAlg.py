@@ -20,8 +20,21 @@ def select(rel, att, op, val):
     # Check for B+_tree existence
     bplus_tree_root = utility.check_bplus_tree_exists(rel, att)
     if bplus_tree_root:
-        # TODO: Implement search using B+_tree
-        print(f"With B+_tree, the cost of searching {att} {op} {val} on {rel} is {pages_read} pages")
+        # Initialize and build the B+ Tree
+        bplus_tree = utility.initialize_bplus_tree(bplus_tree_root)
+        # Traverse the B+ Tree and find relevant leaf nodes
+        leaf_nodes, pages_read = utility.traverse_bplus_tree(bplus_tree, op, val, pages_read)
+
+        # Fetch records from data pages referenced in the leaf nodes
+        for leaf in leaf_nodes:
+            if leaf is not None:
+                for entry in leaf.body:
+                    page_data = utility.read_page_data(rel, entry[1])  # Assuming entry format: (attribute, page_name, index)
+                    record = page_data[entry[2]]
+                    if utility.satisfies_condition(record[att_index], op, val):
+                        result.append(record)
+
+        print(f"With B+ Tree, the cost of searching {att} {op} {val} on {rel} is {pages_read} pages")
     else:
         # Read the order of the pages from pageLink.txt
         with open(page_link_path, 'r') as link_file:

@@ -1,0 +1,19 @@
+{
+    "name": "pg990.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 2,
+    "parent": "pg891.txt",
+    "body": [
+        {
+            "key": 49.39,
+            "left_child": "pg998.txt",
+            "right_child": "pg992.txt"
+        },
+        {
+            "key": 49.55,
+            "left_child": "pg992.txt",
+            "right_child": "pg988.txt"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "name": "pg958.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 1,
+    "parent": "pg965.txt",
+    "body": [
+        {
+            "key": 47.3,
+            "left_child": "pg973.txt",
+            "right_child": "pg959.txt"
+        }
+    ]
+}
