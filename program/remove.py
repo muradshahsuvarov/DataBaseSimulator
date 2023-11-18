@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 
 
 import os
@@ -66,7 +67,60 @@ def removeTree(rel, att):
 
     return "B+ Tree removed successfully."
 
-
-
 def removeTable(rel):
-    return None
+    # Step 1: Read directory data and collect B+ tree roots associated with the relation
+    directory_path = '../index/directory.txt'
+    with open(directory_path, 'r') as file:
+        directory_entries = json.load(file)
+
+    roots_to_remove = [entry[2] for entry in directory_entries if entry[0] == rel]
+
+    # Step 2: Traverse the B+ trees and collect node names
+    def traverse_and_collect(node_name, collected_nodes=[]):
+        file_path = os.path.join('../index/', node_name)
+        if not os.path.exists(file_path):
+            return
+        with open(file_path, 'r') as file:
+            node_data = json.load(file)
+
+        collected_nodes.append(node_data['name'])
+
+        if node_data['type'] == 'I':
+            for entry in node_data['body']:
+                if entry['left_child']:
+                    traverse_and_collect(entry['left_child'], collected_nodes)
+                if entry['right_child']:
+                    traverse_and_collect(entry['right_child'], collected_nodes)
+
+    nodes_to_remove = []
+    for root in roots_to_remove:
+        traverse_and_collect(f"{root}", nodes_to_remove)
+
+    # Step 3: Update page pool
+    page_pool_path = '../index/pagePool.txt'
+    with open(page_pool_path, 'r') as file:
+        page_pool = json.load(file)
+
+    page_pool.extend(nodes_to_remove)
+
+    with open(page_pool_path, 'w') as file:
+        json.dump(page_pool, file, indent=4)
+
+    # Step 4: Remove page files from the index directory
+    for node_name in nodes_to_remove:
+        file_path = os.path.join('../index/', f"{node_name}")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+    # Step 5: Remove the directory entry for the relation
+    new_directory_entries = [entry for entry in directory_entries if entry[0] != rel]
+    with open(directory_path, 'w') as file:
+        json.dump(new_directory_entries, file, indent=4)
+
+    # Step 6: Remove the relation folder
+    relation_path = os.path.join('./data', rel)
+    if os.path.exists(relation_path) and os.path.isdir(relation_path):
+        shutil.rmtree(relation_path)
+
+    return f"Relation {rel} removed successfully."
+
