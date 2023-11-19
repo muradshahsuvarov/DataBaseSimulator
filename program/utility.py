@@ -73,29 +73,31 @@ def traverse_bplus_tree(root, op, val, pages_read):
 
             # If searching for equality and the key is not found, traverse left or right nodes
             if op == '=':
-                # Traverse left siblings
-                left_sibling = node.leftNode
-                while left_sibling:
-                    pages_read += 1
-                    for record in left_sibling.body:
-                        record_val = parse_key(record[0])
-                        if record_val == val:
-                            relevant_leaves.append(left_sibling)
-                        elif record_val > val:
-                            break  # No more relevant records in this sibling
-                    left_sibling = left_sibling.leftNode
 
-                # Traverse right siblings
+                # Traverse siblings
+                left_sibling = node.leftNode
                 right_sibling = node.rightNode
-                while right_sibling:
-                    pages_read += 1
-                    for record in right_sibling.body:
-                        record_val = parse_key(record[0])
-                        if record_val == val:
-                            relevant_leaves.append(right_sibling)
-                        elif record_val < val:
-                            break  # No more relevant records in this sibling
-                    right_sibling = right_sibling.rightNode
+
+                if val <= record_val:
+                    while left_sibling:
+                        pages_read += 1
+                        for record in left_sibling.body:
+                            record_val = parse_key(record[0])
+                            if record_val == val:
+                                relevant_leaves.append(left_sibling)
+                            elif record_val > val:
+                                break  # No more relevant records in this sibling
+                        left_sibling = left_sibling.leftNode
+                else:
+                    while right_sibling:
+                        pages_read += 1
+                        for record in right_sibling.body:
+                            record_val = parse_key(record[0])
+                            if record_val == val:
+                                relevant_leaves.append(right_sibling)
+                            elif record_val < val:
+                                break  # No more relevant records in this sibling
+                        right_sibling = right_sibling.rightNode
 
                 break  # Completed searching through siblings for '=' operation
             elif op == '<' or op == '<=':

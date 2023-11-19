@@ -1,0 +1,974 @@
+8.a)
+
+query:
+
+root = buildTree.build("Suppliers", "sid", 2)
+display.displayTree("pg991.txt")
+selected_supplier = relAlg.select(rel='Suppliers', att='sid', op='=', val='s23')
+
+queryResult.txt:
+
+[
+    [
+        "s23",
+        "Walsh",
+        "21 Queens Road"
+    ]
+]
+
+
+
+8.b)
+
+
+query:
+
+remove.removeTree("Suppliers", "sid")
+selected_supplier = relAlg.select(rel='Suppliers', att='sid', op='==', val='s23')
+
+
+queryResult.txt:
+
+[
+    [
+        "s23",
+        "Walsh",
+        "21 Queens Road"
+    ]
+]
+
+
+8.c)
+
+query:
+
+# Step 1: Select suppliers who supplied 'p15'
+supplied_p15 = relAlg.select('Supply', 'pid', '==', 'p15')
+
+# Step 2: Project sid and address from Suppliers
+suppliers_addresses = relAlg.project('Suppliers', ['sid', 'address'])
+
+# Step 3: Join the results to get the addresses of suppliers who supplied 'p15'
+suppliers_who_supplied_p15 = relAlg.join(supplied_p15, 'sid', suppliers_addresses, 'sid')
+
+
+queryResult.txt:
+
+
+[
+    [
+        "s01",
+        "p15",
+        25.05
+    ],
+    [
+        "s03",
+        "p15",
+        40.36
+    ],
+    [
+        "s04",
+        "p15",
+        37.98
+    ],
+    [
+        "s21",
+        "p15",
+        26.75
+    ]
+]
+
+
+
+[
+    [
+        "s01",
+        "12 Water Street"
+    ],
+    [
+        "s02",
+        "3 Elizabeth Ave"
+    ],
+    [
+        "s03",
+        "20 Scott Street"
+    ],
+    [
+        "s04",
+        "100 Main Road"
+    ],
+    [
+        "s05",
+        "72 Burton Street"
+    ],
+    [
+        "s06",
+        "3 Cabot Street"
+    ],
+    [
+        "s07",
+        "5 Water Street"
+    ],
+    [
+        "s08",
+        "20 Young Ave"
+    ],
+    [
+        "s09",
+        "90 Fox Ave"
+    ],
+    [
+        "s10",
+        "30 Hunt Place"
+    ],
+    [
+        "s11",
+        "3 Torbay Road"
+    ],
+    [
+        "s12",
+        "5 First Street"
+    ],
+    [
+        "s13",
+        "21 Ridge Road"
+    ],
+    [
+        "s14",
+        "90 Fox Ave"
+    ],
+    [
+        "s15",
+        "55 Elizabeth Ave"
+    ],
+    [
+        "s16",
+        "70 Eric Street"
+    ],
+    [
+        "s17",
+        "5 Central Street"
+    ],
+    [
+        "s18",
+        "21 Queens Road"
+    ],
+    [
+        "s19",
+        "4 Croucher Circle"
+    ],
+    [
+        "s20",
+        "1 Greenspond Drive"
+    ],
+    [
+        "s21",
+        "70 Forest Road"
+    ],
+    [
+        "s22",
+        "43 Empire Ave"
+    ],
+    [
+        "s23",
+        "21 Queens Road"
+    ],
+    [
+        "s24",
+        "130 Topsail Road"
+    ],
+    [
+        "s25",
+        "20 Cashin Ave"
+    ],
+    [
+        "s26",
+        "233 Kelly Drive"
+    ]
+]
+
+
+
+[
+    [
+        "s01",
+        "p15",
+        25.05,
+        "12 Water Street"
+    ],
+    [
+        "s03",
+        "p15",
+        40.36,
+        "20 Scott Street"
+    ],
+    [
+        "s04",
+        "p15",
+        37.98,
+        "100 Main Road"
+    ],
+    [
+        "s21",
+        "p15",
+        26.75,
+        "70 Forest Road"
+    ]
+]
+
+
+
+
+
+
+
+8.d)
+
+
+suppliers_kiddie = relAlg.select('Suppliers', 'sname', '==', 'Kiddie')
+
+products_p20 = relAlg.select('Products', 'pid', '==', 'p20')
+
+# Join suppliers_kiddie with Supply on supplier ID
+join1 = relAlg.join(suppliers_kiddie, 'sid', 'Supply', 'sid')
+
+# Join join1 with products_p20 on product ID
+final_join = relAlg.join(join1, 'pid', products_p20, 'pid')
+
+cost_result = relAlg.project(final_join, ['cost'])
+
+
+
+
+
+queryResult.txt:
+
+
+
+[
+    [
+        "s20",
+        "Kiddie",
+        "1 Greenspond Drive"
+    ]
+]
+
+
+
+[
+    [
+        "p20",
+        "shaver",
+        "black"
+    ]
+]
+
+
+
+[
+    [
+        "s20",
+        "Kiddie",
+        "1 Greenspond Drive",
+        "p10",
+        47.12
+    ],
+    [
+        "s20",
+        "Kiddie",
+        "1 Greenspond Drive",
+        "p20",
+        28.82
+    ],
+    [
+        "s20",
+        "Kiddie",
+        "1 Greenspond Drive",
+        "p02",
+        42.32
+    ],
+    [
+        "s20",
+        "Kiddie",
+        "1 Greenspond Drive",
+        "p07",
+        47.69
+    ]
+]
+
+
+
+[
+    [
+        "s20",
+        "Kiddie",
+        "1 Greenspond Drive",
+        "p20",
+        28.82,
+        "shaver",
+        "black"
+    ]
+]
+
+
+
+[
+    [
+        28.82
+    ]
+]
+
+
+
+
+
+
+
+
+
+
+8.e)
+
+
+
+query:
+
+
+
+
+# Step 1: Select records from the Supply relation where cost >= 47
+    selected_supply = relAlg.select('Supply', 'cost', '>=', 47)
+
+# Step 2: Join the selected_supply with Suppliers on supplier ID
+joined_with_suppliers = relAlg.join(selected_supply, 'sid', 'Suppliers', 'sid')
+
+# Step 3: Join the joined_with_suppliers with Products on product ID
+final_join = relAlg.join(joined_with_suppliers, 'pid', 'Products', 'pid')
+
+# Step 4: Project the required attributes: supplier's name, product's name, and cost
+projected_result = relAlg.project(final_join, ['sname', 'pname', 'cost'])
+
+
+
+
+
+
+queryResult.txt:
+
+
+[
+    [
+        "s01",
+        "p23",
+        48.78
+    ],
+    [
+        "s01",
+        "p26",
+        49.85
+    ],
+    [
+        "s02",
+        "p30",
+        49.39
+    ],
+    [
+        "s03",
+        "p29",
+        48.57
+    ],
+    [
+        "s03",
+        "p06",
+        49.55
+    ],
+    [
+        "s04",
+        "p05",
+        47.3
+    ],
+    [
+        "s05",
+        "p01",
+        49.26
+    ],
+    [
+        "s06",
+        "p12",
+        47.3
+    ],
+    [
+        "s07",
+        "p21",
+        47.81
+    ],
+    [
+        "s08",
+        "p13",
+        47.27
+    ],
+    [
+        "s10",
+        "p27",
+        48.01
+    ],
+    [
+        "s11",
+        "p04",
+        49.45
+    ],
+    [
+        "s14",
+        "p01",
+        49.01
+    ],
+    [
+        "s14",
+        "p11",
+        47.62
+    ],
+    [
+        "s16",
+        "p06",
+        49.66
+    ],
+    [
+        "s18",
+        "p10",
+        47.42
+    ],
+    [
+        "s18",
+        "p04",
+        49.62
+    ],
+    [
+        "s18",
+        "p12",
+        48.76
+    ],
+    [
+        "s20",
+        "p10",
+        47.12
+    ],
+    [
+        "s20",
+        "p07",
+        47.69
+    ],
+    [
+        "s21",
+        "p01",
+        47.03
+    ],
+    [
+        "s21",
+        "p16",
+        48.15
+    ],
+    [
+        "s23",
+        "p18",
+        48.82
+    ]
+]
+
+
+
+[
+    [
+        "s01",
+        "p23",
+        48.78,
+        "Brown",
+        "12 Water Street"
+    ],
+    [
+        "s01",
+        "p26",
+        49.85,
+        "Brown",
+        "12 Water Street"
+    ],
+    [
+        "s02",
+        "p30",
+        49.39,
+        "Wang",
+        "3 Elizabeth Ave"
+    ],
+    [
+        "s03",
+        "p29",
+        48.57,
+        "Carew",
+        "20 Scott Street"
+    ],
+    [
+        "s03",
+        "p06",
+        49.55,
+        "Carew",
+        "20 Scott Street"
+    ],
+    [
+        "s04",
+        "p05",
+        47.3,
+        "Carter",
+        "100 Main Road"
+    ],
+    [
+        "s05",
+        "p01",
+        49.26,
+        "Evoy",
+        "72 Burton Street"
+    ],
+    [
+        "s06",
+        "p12",
+        47.3,
+        "Evans",
+        "3 Cabot Street"
+    ],
+    [
+        "s07",
+        "p21",
+        47.81,
+        "Lee",
+        "5 Water Street"
+    ],
+    [
+        "s08",
+        "p13",
+        47.27,
+        "Carter",
+        "20 Young Ave"
+    ],
+    [
+        "s10",
+        "p27",
+        48.01,
+        "kielly",
+        "30 Hunt Place"
+    ],
+    [
+        "s11",
+        "p04",
+        49.45,
+        "Zhang",
+        "3 Torbay Road"
+    ],
+    [
+        "s14",
+        "p01",
+        49.01,
+        "Edward",
+        "90 Fox Ave"
+    ],
+    [
+        "s14",
+        "p11",
+        47.62,
+        "Edward",
+        "90 Fox Ave"
+    ],
+    [
+        "s16",
+        "p06",
+        49.66,
+        "Newwll",
+        "70 Eric Street"
+    ],
+    [
+        "s18",
+        "p10",
+        47.42,
+        "Hayley",
+        "21 Queens Road"
+    ],
+    [
+        "s18",
+        "p04",
+        49.62,
+        "Hayley",
+        "21 Queens Road"
+    ],
+    [
+        "s18",
+        "p12",
+        48.76,
+        "Hayley",
+        "21 Queens Road"
+    ],
+    [
+        "s20",
+        "p10",
+        47.12,
+        "Kiddie",
+        "1 Greenspond Drive"
+    ],
+    [
+        "s20",
+        "p07",
+        47.69,
+        "Kiddie",
+        "1 Greenspond Drive"
+    ],
+    [
+        "s21",
+        "p01",
+        47.03,
+        "Kieley",
+        "70 Forest Road"
+    ],
+    [
+        "s21",
+        "p16",
+        48.15,
+        "Kieley",
+        "70 Forest Road"
+    ],
+    [
+        "s23",
+        "p18",
+        48.82,
+        "Walsh",
+        "21 Queens Road"
+    ]
+]
+
+
+
+[
+    [
+        "s01",
+        "p23",
+        48.78,
+        "Brown",
+        "12 Water Street",
+        "shovel",
+        "maroon"
+    ],
+    [
+        "s01",
+        "p26",
+        49.85,
+        "Brown",
+        "12 Water Street",
+        "grill",
+        "black"
+    ],
+    [
+        "s02",
+        "p30",
+        49.39,
+        "Wang",
+        "3 Elizabeth Ave",
+        "siding",
+        "grey"
+    ],
+    [
+        "s03",
+        "p29",
+        48.57,
+        "Carew",
+        "20 Scott Street",
+        "paint",
+        "fuchsia"
+    ],
+    [
+        "s03",
+        "p06",
+        49.55,
+        "Carew",
+        "20 Scott Street",
+        "air conditioner",
+        "pink"
+    ],
+    [
+        "s04",
+        "p05",
+        47.3,
+        "Carter",
+        "100 Main Road",
+        "vacuum",
+        "black"
+    ],
+    [
+        "s05",
+        "p01",
+        49.26,
+        "Evoy",
+        "72 Burton Street",
+        "matherboard",
+        "grey"
+    ],
+    [
+        "s06",
+        "p12",
+        47.3,
+        "Evans",
+        "3 Cabot Street",
+        "switch",
+        "yellow"
+    ],
+    [
+        "s07",
+        "p21",
+        47.81,
+        "Lee",
+        "5 Water Street",
+        "fan",
+        "aqua"
+    ],
+    [
+        "s08",
+        "p13",
+        47.27,
+        "Carter",
+        "20 Young Ave",
+        "screwdriver",
+        "pink"
+    ],
+    [
+        "s10",
+        "p27",
+        48.01,
+        "kielly",
+        "30 Hunt Place",
+        "kettle",
+        "maroon"
+    ],
+    [
+        "s11",
+        "p04",
+        49.45,
+        "Zhang",
+        "3 Torbay Road",
+        "flashlight",
+        "white"
+    ],
+    [
+        "s14",
+        "p01",
+        49.01,
+        "Edward",
+        "90 Fox Ave",
+        "matherboard",
+        "grey"
+    ],
+    [
+        "s14",
+        "p11",
+        47.62,
+        "Edward",
+        "90 Fox Ave",
+        "monitor",
+        "black"
+    ],
+    [
+        "s16",
+        "p06",
+        49.66,
+        "Newwll",
+        "70 Eric Street",
+        "air conditioner",
+        "pink"
+    ],
+    [
+        "s18",
+        "p10",
+        47.42,
+        "Hayley",
+        "21 Queens Road",
+        "usb",
+        "red"
+    ],
+    [
+        "s18",
+        "p04",
+        49.62,
+        "Hayley",
+        "21 Queens Road",
+        "flashlight",
+        "white"
+    ],
+    [
+        "s18",
+        "p12",
+        48.76,
+        "Hayley",
+        "21 Queens Road",
+        "switch",
+        "yellow"
+    ],
+    [
+        "s20",
+        "p10",
+        47.12,
+        "Kiddie",
+        "1 Greenspond Drive",
+        "usb",
+        "red"
+    ],
+    [
+        "s20",
+        "p07",
+        47.69,
+        "Kiddie",
+        "1 Greenspond Drive",
+        "sander",
+        "red"
+    ],
+    [
+        "s21",
+        "p01",
+        47.03,
+        "Kieley",
+        "70 Forest Road",
+        "matherboard",
+        "grey"
+    ],
+    [
+        "s21",
+        "p16",
+        48.15,
+        "Kieley",
+        "70 Forest Road",
+        "chair",
+        "blue"
+    ],
+    [
+        "s23",
+        "p18",
+        48.82,
+        "Walsh",
+        "21 Queens Road",
+        "sofa",
+        "teal"
+    ]
+]
+
+
+
+[
+    [
+        "Brown",
+        "shovel",
+        48.78
+    ],
+    [
+        "Brown",
+        "grill",
+        49.85
+    ],
+    [
+        "Wang",
+        "siding",
+        49.39
+    ],
+    [
+        "Carew",
+        "paint",
+        48.57
+    ],
+    [
+        "Carew",
+        "air conditioner",
+        49.55
+    ],
+    [
+        "Carter",
+        "vacuum",
+        47.3
+    ],
+    [
+        "Evoy",
+        "matherboard",
+        49.26
+    ],
+    [
+        "Evans",
+        "switch",
+        47.3
+    ],
+    [
+        "Lee",
+        "fan",
+        47.81
+    ],
+    [
+        "Carter",
+        "screwdriver",
+        47.27
+    ],
+    [
+        "kielly",
+        "kettle",
+        48.01
+    ],
+    [
+        "Zhang",
+        "flashlight",
+        49.45
+    ],
+    [
+        "Edward",
+        "matherboard",
+        49.01
+    ],
+    [
+        "Edward",
+        "monitor",
+        47.62
+    ],
+    [
+        "Newwll",
+        "air conditioner",
+        49.66
+    ],
+    [
+        "Hayley",
+        "usb",
+        47.42
+    ],
+    [
+        "Hayley",
+        "flashlight",
+        49.62
+    ],
+    [
+        "Hayley",
+        "switch",
+        48.76
+    ],
+    [
+        "Kiddie",
+        "usb",
+        47.12
+    ],
+    [
+        "Kiddie",
+        "sander",
+        47.69
+    ],
+    [
+        "Kieley",
+        "matherboard",
+        47.03
+    ],
+    [
+        "Kieley",
+        "chair",
+        48.15
+    ],
+    [
+        "Walsh",
+        "sofa",
+        48.82
+    ]
+]
+
