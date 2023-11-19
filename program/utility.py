@@ -36,6 +36,7 @@ def initialize_bplus_tree(root_file_name):
 
 def traverse_bplus_tree(root, op, val, pages_read):
     relevant_leaves = []
+    key_found = False  # Flag to indicate if the key is found
     node = root  # Start from the root of the tree
 
     # Function to parse the key into a comparable format
@@ -62,7 +63,6 @@ def traverse_bplus_tree(root, op, val, pages_read):
 
     # Traverse the tree to find relevant leaves
     while node:
-        print(node.name)
         pages_read += 1  # Increment page count when a new node is visited
         if node.type == 'L':
             # For leaf nodes, check if records satisfy the condition
@@ -70,9 +70,26 @@ def traverse_bplus_tree(root, op, val, pages_read):
                 record_val = parse_key(record[0])
                 if compare(record_val, op, val):
                     relevant_leaves.append(node)
+                    key_found = True  # Set flag to true if key is found
                     break  # Break after finding the first matching record for '='
-            if op == '=':
-                break
+
+            # If searching for equality and the key is not found, traverse left or right nodes
+            if op == '=' and not key_found:
+                # Compare with the first key of the leaf to decide the direction
+                first_key_in_leaf = parse_key(node.body[0][0]) if node.body else None
+                if first_key_in_leaf is not None:
+                    if val <= first_key_in_leaf and node.leftNode:
+                        node = node.leftNode
+                        continue
+                    elif val > first_key_in_leaf and node.rightNode:
+                        node = node.rightNode
+                        continue
+                    else:
+                        break  # Stop if there is no appropriate sibling to traverse
+                else:
+                    break  # Stop if the leaf is empty (should not normally happen)
+            elif op != '=' or key_found:
+                break  # Stop if not searching for equality or key is found
             # For range queries, check adjacent nodes
             if op in ['<', '<='] and node.leftNode:
                 node = node.leftNode
@@ -83,6 +100,7 @@ def traverse_bplus_tree(root, op, val, pages_read):
         else:  # Handling for internal nodes
             for i, entry in enumerate(node.body):
                 entry_val = parse_key(entry.key)
+
                 if op in ['<', '<=']:
                     if val == entry_val:
                         node = entry.left_child
@@ -107,10 +125,29 @@ def traverse_bplus_tree(root, op, val, pages_read):
                 elif op in ['>', '>='] and val < entry_val:
                     node = entry.left_child
                     break
-                elif (op == '=') and (i == 0 or val >= parse_key(node.body[i - 1].key)) and \
-                        (i == len(node.body) - 1 or val < entry_val):
-                    node = entry.left_child
-                    break
+                elif op == '=':
+                    if val == entry_val:
+                        node = entry.left_child
+                        break
+                    elif i < len(node.body) - 1:
+
+                        if val < entry_val:
+                            node = entry.left_child
+                            break
+
+                        if val > parse_key(node.body[i + 1].key):
+                            node = node.body[i + 1].right_child
+                            break
+                        elif val < parse_key(node.body[i + 1].key):
+                            node = entry.right_child
+                            break
+                    else:
+                        if val > entry_val:
+                            node = entry.right_child
+                            break
+                        elif val < entry_val:
+                            node = entry.left_child
+                            break
             else:
                 if op == '=' and node.body:
                     node = node.body[-1].right_child
@@ -118,7 +155,6 @@ def traverse_bplus_tree(root, op, val, pages_read):
                     break
 
     return relevant_leaves, pages_read
-
 
 
 def read_page_data(rel, page_file):
@@ -353,7 +389,6 @@ class BPlusTree:
                 self.split_node(node.parent)
 
     def insert(self, attribute, page_name, index):
-        # Public method to insert a new value into the tree
         value = (attribute, page_name, index)
         self.insert_into_tree(value)
 

@@ -1,19 +1,16 @@
 {
     "name": "pg923.txt",
-    "type": "I",
+    "type": "L",
     "capacity": 2,
-    "current_keys": 2,
-    "parent": "pg911.txt",
+    "current_keys": 1,
+    "parent": "pg931.txt",
+    "leftNode": "pg924.txt",
+    "rightNode": "pg922.txt",
     "body": [
-        {
-            "key": 34.75,
-            "left_child": "pg950.txt",
-            "right_child": "pg895.txt"
-        },
-        {
-            "key": 35.02,
-            "left_child": "pg950.txt",
-            "right_child": "pg913.txt"
-        }
+        [
+            "s15",
+            "page30.txt",
+            1
+        ]
     ]
 }

@@ -1,21 +1,14 @@
 {
     "name": "pg896.txt",
-    "type": "L",
+    "type": "I",
     "capacity": 2,
-    "current_keys": 2,
-    "parent": "pg895.txt",
-    "leftNode": "pg886.txt",
-    "rightNode": "pg908.txt",
+    "current_keys": 1,
+    "parent": "pg887.txt",
     "body": [
-        [
-            36.26,
-            "page46.txt",
-            1
-        ],
-        [
-            37.65,
-            "page42.txt",
-            0
-        ]
+        {
+            "key": "s21",
+            "left_child": "pg898.txt",
+            "right_child": "pg891.txt"
+        }
     ]
 }

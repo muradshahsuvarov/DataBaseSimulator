@@ -2,19 +2,14 @@
     "name": "pg883.txt",
     "type": "L",
     "capacity": 2,
-    "current_keys": 2,
-    "parent": "pg973.txt",
-    "leftNode": "pg975.txt",
-    "rightNode": "pg960.txt",
+    "current_keys": 1,
+    "parent": "pg888.txt",
+    "leftNode": "pg884.txt",
+    "rightNode": "pg882.txt",
     "body": [
         [
-            38.01,
-            "page53.txt",
-            0
-        ],
-        [
-            40.23,
-            "page51.txt",
+            "s23",
+            "page47.txt",
             0
         ]
     ]

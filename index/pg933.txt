@@ -1,14 +1,16 @@
 {
     "name": "pg933.txt",
-    "type": "I",
+    "type": "L",
     "capacity": 2,
     "current_keys": 1,
-    "parent": null,
+    "parent": "pg931.txt",
+    "leftNode": "pg934.txt",
+    "rightNode": "pg932.txt",
     "body": [
-        {
-            "key": 34.02,
-            "left_child": "pg964.txt",
-            "right_child": "pg934.txt"
-        }
+        [
+            "s14",
+            "page27.txt",
+            1
+        ]
     ]
 }

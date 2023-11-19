@@ -3,14 +3,14 @@
     "type": "L",
     "capacity": 2,
     "current_keys": 1,
-    "parent": "pg959.txt",
-    "leftNode": "pg960.txt",
-    "rightNode": "pg969.txt",
+    "parent": "pg977.txt",
+    "leftNode": "pg975.txt",
+    "rightNode": "pg973.txt",
     "body": [
         [
-            47.3,
-            "page11.txt",
-            0
+            "s05",
+            "page10.txt",
+            1
         ]
     ]
 }

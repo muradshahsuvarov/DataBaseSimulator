@@ -1,14 +1,16 @@
 {
     "name": "pg985.txt",
-    "type": "I",
+    "type": "L",
     "capacity": 2,
     "current_keys": 1,
-    "parent": "pg935.txt",
+    "parent": "pg989.txt",
+    "leftNode": "pg986.txt",
+    "rightNode": "pg984.txt",
     "body": [
-        {
-            "key": 30.98,
-            "left_child": "pg994.txt",
-            "right_child": "pg978.txt"
-        }
+        [
+            "s03",
+            "page05.txt",
+            1
+        ]
     ]
 }

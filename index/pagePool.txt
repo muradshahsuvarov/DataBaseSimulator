@@ -868,18 +868,5 @@
     "pg866.txt",
     "pg867.txt",
     "pg868.txt",
-    "pg869.txt",
-    "pg870.txt",
-    "pg871.txt",
-    "pg872.txt",
-    "pg873.txt",
-    "pg874.txt",
-    "pg875.txt",
-    "pg876.txt",
-    "pg877.txt",
-    "pg878.txt",
-    "pg879.txt",
-    "pg880.txt",
-    "pg881.txt",
-    "pg882.txt"
+    "pg869.txt"
 ]

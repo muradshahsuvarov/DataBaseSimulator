@@ -2,20 +2,15 @@
     "name": "pg910.txt",
     "type": "L",
     "capacity": 2,
-    "current_keys": 2,
-    "parent": "pg909.txt",
-    "leftNode": "pg894.txt",
-    "rightNode": "pg970.txt",
+    "current_keys": 1,
+    "parent": "pg908.txt",
+    "leftNode": "pg911.txt",
+    "rightNode": "pg909.txt",
     "body": [
         [
-            29.07,
-            "page38.txt",
+            "s18",
+            "page36.txt",
             1
-        ],
-        [
-            35.53,
-            "page14.txt",
-            0
         ]
     ]
 }

@@ -1,0 +1,19 @@
+{
+    "name": "pg928.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 2,
+    "parent": null,
+    "body": [
+        {
+            "key": "s08",
+            "left_child": "pg967.txt",
+            "right_child": "pg929.txt"
+        },
+        {
+            "key": "s16",
+            "left_child": "pg929.txt",
+            "right_child": "pg886.txt"
+        }
+    ]
+}

@@ -1,21 +1,14 @@
 {
     "name": "pg888.txt",
-    "type": "L",
+    "type": "I",
     "capacity": 2,
-    "current_keys": 2,
-    "parent": "pg913.txt",
-    "leftNode": "pg914.txt",
-    "rightNode": "pg907.txt",
+    "current_keys": 1,
+    "parent": "pg887.txt",
     "body": [
-        [
-            45.83,
-            "page45.txt",
-            0
-        ],
-        [
-            46.37,
-            "page49.txt",
-            1
-        ]
+        {
+            "key": "s23",
+            "left_child": "pg890.txt",
+            "right_child": "pg883.txt"
+        }
     ]
 }

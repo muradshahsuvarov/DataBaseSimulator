@@ -1,14 +1,16 @@
 {
     "name": "pg959.txt",
-    "type": "I",
+    "type": "L",
     "capacity": 2,
     "current_keys": 1,
-    "parent": "pg958.txt",
+    "parent": "pg957.txt",
+    "leftNode": "pg960.txt",
+    "rightNode": "pg958.txt",
     "body": [
-        {
-            "key": 47.81,
-            "left_child": "pg974.txt",
-            "right_child": "pg969.txt"
-        }
+        [
+            "s08",
+            "page16.txt",
+            1
+        ]
     ]
 }

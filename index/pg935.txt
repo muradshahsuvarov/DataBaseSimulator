@@ -1,14 +1,16 @@
 {
     "name": "pg935.txt",
-    "type": "I",
+    "type": "L",
     "capacity": 2,
     "current_keys": 1,
-    "parent": "pg934.txt",
+    "parent": "pg936.txt",
+    "leftNode": "pg937.txt",
+    "rightNode": "pg934.txt",
     "body": [
-        {
-            "key": 40.89,
-            "left_child": "pg985.txt",
-            "right_child": "pg936.txt"
-        }
+        [
+            "s13",
+            "page26.txt",
+            1
+        ]
     ]
 }

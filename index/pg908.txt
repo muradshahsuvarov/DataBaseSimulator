@@ -1,21 +1,14 @@
 {
     "name": "pg908.txt",
-    "type": "L",
+    "type": "I",
     "capacity": 2,
-    "current_keys": 2,
-    "parent": "pg950.txt",
-    "leftNode": "pg896.txt",
-    "rightNode": "pg921.txt",
+    "current_keys": 1,
+    "parent": "pg907.txt",
     "body": [
-        [
-            34.1,
-            "page39.txt",
-            0
-        ],
-        [
-            35.45,
-            "page33.txt",
-            0
-        ]
+        {
+            "key": "s19",
+            "left_child": "pg910.txt",
+            "right_child": "pg902.txt"
+        }
     ]
 }

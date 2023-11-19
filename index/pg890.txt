@@ -2,19 +2,14 @@
     "name": "pg890.txt",
     "type": "L",
     "capacity": 2,
-    "current_keys": 2,
-    "parent": "pg924.txt",
-    "leftNode": "pg926.txt",
-    "rightNode": "pg925.txt",
+    "current_keys": 1,
+    "parent": "pg888.txt",
+    "leftNode": "pg891.txt",
+    "rightNode": "pg889.txt",
     "body": [
         [
-            41.44,
-            "page38.txt",
-            0
-        ],
-        [
-            41.55,
-            "page49.txt",
+            "s22",
+            "page45.txt",
             0
         ]
     ]
