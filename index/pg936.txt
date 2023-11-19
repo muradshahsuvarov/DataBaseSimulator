@@ -1,14 +1,19 @@
 {
     "name": "pg936.txt",
     "type": "I",
-    "capacity": 2,
-    "current_keys": 1,
-    "parent": "pg930.txt",
+    "capacity": 4,
+    "current_keys": 2,
+    "parent": "pg947.txt",
     "body": [
         {
-            "key": "s13",
-            "left_child": "pg938.txt",
-            "right_child": "pg935.txt"
+            "key": "p23",
+            "left_child": "pg981.txt",
+            "right_child": "pg956.txt"
+        },
+        {
+            "key": "p24",
+            "left_child": "pg956.txt",
+            "right_child": "pg950.txt"
         }
     ]
 }

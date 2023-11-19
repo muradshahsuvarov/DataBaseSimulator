@@ -1,16 +1,26 @@
 {
     "name": "pg979.txt",
     "type": "L",
-    "capacity": 2,
-    "current_keys": 1,
-    "parent": "pg977.txt",
-    "leftNode": "pg980.txt",
-    "rightNode": "pg978.txt",
+    "capacity": 4,
+    "current_keys": 3,
+    "parent": "pg968.txt",
+    "leftNode": "pg970.txt",
+    "rightNode": "pg951.txt",
     "body": [
         [
-            "s04",
-            "page08.txt",
-            1
+            "p26",
+            "page01.txt",
+            0
+        ],
+        [
+            "p26",
+            "page03.txt",
+            0
+        ],
+        [
+            "p26",
+            "page48.txt",
+            0
         ]
     ]
 }

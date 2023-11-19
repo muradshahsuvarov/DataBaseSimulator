@@ -1,14 +1,19 @@
 {
     "name": "pg968.txt",
     "type": "I",
-    "capacity": 2,
-    "current_keys": 1,
-    "parent": "pg967.txt",
+    "capacity": 4,
+    "current_keys": 2,
+    "parent": "pg947.txt",
     "body": [
         {
-            "key": "s06",
-            "left_child": "pg977.txt",
-            "right_child": "pg969.txt"
+            "key": "p26",
+            "left_child": "pg979.txt",
+            "right_child": "pg951.txt"
+        },
+        {
+            "key": "p27",
+            "left_child": "pg979.txt",
+            "right_child": "pg957.txt"
         }
     ]
 }

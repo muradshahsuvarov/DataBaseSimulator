@@ -63,7 +63,6 @@ def traverse_bplus_tree(root, op, val, pages_read):
 
     # Traverse the tree to find relevant leaves
     while node:
-        print(node.name)
         pages_read += 1  # Increment page count when a new node is visited
         if node.type == 'L':
             # For leaf nodes, check if records satisfy the condition
@@ -117,9 +116,16 @@ def traverse_bplus_tree(root, op, val, pages_read):
                         node = entry.left_child
                         break
                     elif i < len(node.body) - 1:
+                        # If val is greater than the key of the next entry, continue moving right
                         if val > parse_key(node.body[i + 1].key):
-                            node = node.body[i + 1].right_child
-                            break
+                            if i + 1 == len(node.body) - 1:
+                                # If we are at the last entry, take its right child
+                                node = node.body[-1].right_child
+                                break # CHECK WITH OTHER RELATIONS, CALL THE SELECT AND CHECK
+                            else:
+                                # Otherwise, continue with the next entry
+                                continue
+                        # If val is less than the key of the next entry, take the right child of the current entry
                         elif val < parse_key(node.body[i + 1].key):
                             node = entry.right_child
                             break
@@ -141,14 +147,16 @@ def traverse_bplus_tree(root, op, val, pages_read):
                         node = entry.left_child
                         break
                     elif i < len(node.body) - 1:
-
-                        if val < entry_val:
-                            node = entry.left_child
-                            break
-
+                        # If val is greater than the key of the next entry, continue moving right
                         if val > parse_key(node.body[i + 1].key):
-                            node = node.body[i + 1].right_child
-                            break
+                            if i + 1 == len(node.body) - 1:
+                                # If we are at the last entry, take its right child
+                                node = node.body[-1].right_child
+                                break # CHECK WITH OTHER RELATIONS, CALL THE SELECT AND CHECK
+                            else:
+                                # Otherwise, continue with the next entry
+                                continue
+                        # If val is less than the key of the next entry, take the right child of the current entry
                         elif val < parse_key(node.body[i + 1].key):
                             node = entry.right_child
                             break

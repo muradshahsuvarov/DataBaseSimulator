@@ -1,0 +1,26 @@
+{
+    "name": "pg950.txt",
+    "type": "L",
+    "capacity": 4,
+    "current_keys": 3,
+    "parent": "pg936.txt",
+    "leftNode": "pg956.txt",
+    "rightNode": "pg970.txt",
+    "body": [
+        [
+            "p24",
+            "page37.txt",
+            1
+        ],
+        [
+            "p25",
+            "page13.txt",
+            1
+        ],
+        [
+            "p25",
+            "page37.txt",
+            0
+        ]
+    ]
+}

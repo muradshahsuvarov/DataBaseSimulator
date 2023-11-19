@@ -1,16 +1,24 @@
 {
     "name": "pg938.txt",
-    "type": "L",
-    "capacity": 2,
-    "current_keys": 1,
-    "parent": "pg936.txt",
-    "leftNode": "pg939.txt",
-    "rightNode": "pg937.txt",
+    "type": "I",
+    "capacity": 4,
+    "current_keys": 3,
+    "parent": "pg974.txt",
     "body": [
-        [
-            "s12",
-            "page25.txt",
-            1
-        ]
+        {
+            "key": "p11",
+            "left_child": "pg958.txt",
+            "right_child": "pg935.txt"
+        },
+        {
+            "key": "p12",
+            "left_child": "pg958.txt",
+            "right_child": "pg934.txt"
+        },
+        {
+            "key": "p13",
+            "left_child": "pg953.txt",
+            "right_child": "pg940.txt"
+        }
     ]
 }

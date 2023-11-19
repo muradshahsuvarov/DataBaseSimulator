@@ -1,15 +1,25 @@
 {
     "name": "pg964.txt",
     "type": "L",
-    "capacity": 2,
-    "current_keys": 1,
-    "parent": "pg969.txt",
-    "leftNode": "pg965.txt",
-    "rightNode": "pg963.txt",
+    "capacity": 4,
+    "current_keys": 3,
+    "parent": "pg960.txt",
+    "leftNode": "pg940.txt",
+    "rightNode": "pg962.txt",
     "body": [
         [
-            "s07",
-            "page14.txt",
+            "p04",
+            "page20.txt",
+            1
+        ],
+        [
+            "p04",
+            "page23.txt",
+            1
+        ],
+        [
+            "p05",
+            "page08.txt",
             0
         ]
     ]

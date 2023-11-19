@@ -1,14 +1,31 @@
 {
     "name": "pg957.txt",
-    "type": "I",
-    "capacity": 2,
-    "current_keys": 1,
-    "parent": "pg948.txt",
+    "type": "L",
+    "capacity": 4,
+    "current_keys": 4,
+    "parent": "pg968.txt",
+    "leftNode": "pg949.txt",
+    "rightNode": "pg967.txt",
     "body": [
-        {
-            "key": "s09",
-            "left_child": "pg959.txt",
-            "right_child": "pg958.txt"
-        }
+        [
+            "p27",
+            "page17.txt",
+            1
+        ],
+        [
+            "p27",
+            "page25.txt",
+            0
+        ],
+        [
+            "p27",
+            "page28.txt",
+            0
+        ],
+        [
+            "p27",
+            "page51.txt",
+            1
+        ]
     ]
 }

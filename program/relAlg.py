@@ -1,7 +1,7 @@
 import json
 import os
 import utility
-
+import uuid
 
 def select(rel, att, op, val):
     result = []  # To store the tuples that satisfy the condition
@@ -59,16 +59,54 @@ def select(rel, att, op, val):
 
         print(f"Without B+_tree, the cost of searching {att} {op} {val} on {rel} is {pages_read} pages")
 
-    # Save the result to a file and return its name
-    result_file_path = '../queryOutput/queryResult.txt'
-    with open(result_file_path, 'w') as file:
-        json.dump(result, file)
+    # Generate a new relation name
+    new_rel_name = f"{rel}_selected_on_{att}_{op}_{val}"
+    new_rel_path = f'../data/{new_rel_name}'
 
-    result_relation_name = f"{rel}_selected_on_{att}_{op}_{val}"
+    # Create a new directory for this relation
+    os.makedirs(new_rel_path, exist_ok=True)
 
-    print(f"Successfully saved the select result to {result_file_path}")
+    # Create a page pool for the new relation
+    with open(f'../data/pagePool.txt', 'r') as page_pool_file:
+        page_pool = json.load(page_pool_file)
 
-    return result_relation_name
+    # Create pageLink.txt for the new relation
+    page_link = []
+    page_count = 0
+
+    # Split the result into pages and write each page
+    page_size = 2
+    for i in range(0, len(result), page_size):
+        page = result[i:i + page_size]
+        page_name = page_pool.pop(0)  # or however you want to name your pages
+        page_link.append(page_name)
+        page_count += 1
+
+        with open(os.path.join(new_rel_path, page_name), 'w') as page_file:
+            json.dump(page, page_file)
+
+    # Write the page link information
+    with open(os.path.join(new_rel_path, 'pageLink.txt'), 'w') as link_file:
+        json.dump(page_link, link_file)
+
+    # Update the page pool
+    with open(f'../data/pagePool.txt', 'w') as page_pool_file:
+        json.dump(page_pool, page_pool_file)
+
+    # Read the current schemas from schemas.txt
+    with open('../data/schemas.txt', 'r') as schema_file:
+        schemas = json.load(schema_file)
+
+    # Append new schema info for the selected relation
+    for attribute in schema_dict:
+        schemas.append([new_rel_name, attribute, 'str', schema_dict[attribute]])
+
+    # Write the updated schemas back to schemas.txt
+    with open('../data/schemas.txt', 'w') as schema_file:
+        json.dump(schemas, schema_file)
+
+    print(f"Select operation completed. Pages written: {page_count}")
+    return new_rel_name
 
 
 def project(rel, attList):
@@ -94,20 +132,62 @@ def project(rel, attList):
         with open(os.path.join(pages_path, page_file), 'r') as file:
             page_data = json.load(file)
             for record in page_data:
-                # Extract only the specified attributes for each record
                 projected_record = [record[i] for i in att_indexes]
                 projected_data.append(projected_record)
 
-    # Save the projected data to a file and return its name
-    result_file_path = f'../queryOutput/{rel}_projected_on_{"_".join(attList)}.txt'
-    with open(result_file_path, 'w') as file:
-        json.dump(projected_data, file)
+    # Generate a new relation name
+    new_rel_name = f"{rel}_projected_on_{'_'.join(attList)}"
+    new_rel_path = f'../data/{new_rel_name}'
 
-    result_relation_name = f"{rel}_projected_on_{'_'.join(attList)}"
+    # Create a new directory for this relation
+    os.makedirs(new_rel_path, exist_ok=True)
 
-    print(f"Successfully saved the projection result to {result_file_path}")
+    # Read page pool for the new relation
+    with open(f'../data/pagePool.txt', 'r') as page_pool_file:
+        page_pool = json.load(page_pool_file)
 
-    return result_relation_name
+    # Create pageLink.txt for the new relation
+    page_link = []
+    page_count = 0
+    page_size = 2  # Define the number of records per page
+
+    # Split the projected data into pages and write each page
+    for i in range(0, len(projected_data), page_size):
+        page = projected_data[i:i + page_size]
+        page_name = page_pool.pop(0)
+        page_link.append(page_name)
+        page_count += 1
+
+        with open(os.path.join(new_rel_path, page_name), 'w') as page_file:
+            json.dump(page, page_file)
+
+    # Write the page link information
+    with open(os.path.join(new_rel_path, 'pageLink.txt'), 'w') as link_file:
+        json.dump(page_link, link_file)
+
+    # Update the page pool
+    with open(f'../data/pagePool.txt', 'w') as page_pool_file:
+        json.dump(page_pool, page_pool_file)
+
+    # Update schemas.txt with the new relation schema
+    with open('../data/schemas.txt', 'r') as schema_file:
+        schemas = json.load(schema_file)
+
+    # Append new schema info for the projected relation
+    for i, att in enumerate(attList):
+        schemas.append([new_rel_name, att, 'str', i])  # Assuming all attributes are of type string
+
+    with open('../data/schemas.txt', 'w') as schema_file:
+        json.dump(schemas, schema_file)
+
+    # Save the result to queryOutput/queryResult.txt
+    with open('../queryOutput/queryResult.txt', 'w') as result_file:
+        json.dump(projected_data, result_file)
+
+    print(f"Projection operation completed. Pages written: {page_count}")
+    return new_rel_name
+
+
 
 
 def join(rel1, att1, rel2, att2):
@@ -170,11 +250,55 @@ def join(rel1, att1, rel2, att2):
                             combined_record = record1 + [record2[i] for i in range(len(record2)) if i != schema2[att2]]
                             join_result.append(combined_record)
 
-    # Save the result to a file and return its name
-    result_relation_name = f"{rel1}_{rel2}_joined"
-    result_file_path = f'../queryOutput/{result_relation_name}.txt'
-    with open(result_file_path, 'w') as file:
-        json.dump(join_result, file, indent=4)
+    # Generate a new relation name for join result
+    new_rel_name = f"{rel1}_{rel2}_joined"
+    new_rel_path = f'../data/{new_rel_name}'
 
-    print(f"Successfully saved the join into {result_file_path}")
-    return result_relation_name
+    # Create a new directory for this relation
+    os.makedirs(new_rel_path, exist_ok=True)
+
+    # Create a page pool for the new relation
+    with open(f'../data/pagePool.txt', 'r') as page_pool_file:
+        page_pool = json.load(page_pool_file)
+
+    # Create pageLink.txt for the new relation
+    page_link = []
+    page_count = 0
+    page_size = 2  # Define the number of records per page
+
+    # Split the join result into pages and write each page
+    for i in range(0, len(join_result), page_size):
+        page = join_result[i:i + page_size]
+        page_name = page_pool.pop(0)
+        page_link.append(page_name)
+        page_count += 1
+
+        with open(os.path.join(new_rel_path, page_name), 'w') as page_file:
+            json.dump(page, page_file)
+
+    # Write the page link information
+    with open(os.path.join(new_rel_path, 'pageLink.txt'), 'w') as link_file:
+        json.dump(page_link, link_file)
+
+    # Update the page pool
+    with open(f'../data/pagePool.txt', 'w') as page_pool_file:
+        json.dump(page_pool, page_pool_file)
+
+    # Update schemas.txt with the new relation schema
+    with open('../data/schemas.txt', 'r') as schema_file:
+        schemas = json.load(schema_file)
+
+    # Append new schema info for the joined relation
+    for i, attribute in enumerate(list(schema1.keys()) + list(schema2.keys())):
+        schemas.append([new_rel_name, attribute, 'str', i])  # Assuming all attributes are of type string
+
+
+    with open('../data/schemas.txt', 'w') as schema_file:
+        json.dump(schemas, schema_file)
+
+    # Save the result to queryOutput/queryResult.txt
+    with open('../queryOutput/queryResult.txt', 'w') as result_file:
+        json.dump(join_result, result_file)
+
+    print(f"Join operation completed. Pages written: {page_count}")
+    return new_rel_name

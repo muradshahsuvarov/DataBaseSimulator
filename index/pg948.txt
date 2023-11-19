@@ -1,14 +1,19 @@
 {
     "name": "pg948.txt",
     "type": "I",
-    "capacity": 2,
-    "current_keys": 1,
-    "parent": "pg929.txt",
+    "capacity": 4,
+    "current_keys": 2,
+    "parent": "pg947.txt",
     "body": [
         {
-            "key": "s10",
-            "left_child": "pg957.txt",
-            "right_child": "pg949.txt"
+            "key": "p29",
+            "left_child": "pg978.txt",
+            "right_child": "pg971.txt"
+        },
+        {
+            "key": "p30",
+            "left_child": "pg971.txt",
+            "right_child": "pg941.txt"
         }
     ]
 }
