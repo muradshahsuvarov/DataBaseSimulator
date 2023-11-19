@@ -1,7 +1,7 @@
 import json
 import os
 import utility
-import uuid
+
 
 def select(rel, att, op, val):
     result = []  # To store the tuples that satisfy the condition
@@ -59,51 +59,49 @@ def select(rel, att, op, val):
 
         print(f"Without B+_tree, the cost of searching {att} {op} {val} on {rel} is {pages_read} pages")
 
-    # Generate a new relation name
-    new_rel_name = f"{rel}_selected_on_{att}_{op}_{val}"
+    # Adjusting the directory name to avoid invalid characters
+    op_map = {'>=': 'GE', '<=': 'LE', '>': 'GT', '<': 'LT', '=': 'EQ'}
+    safe_op = op_map.get(op, op)
+    new_rel_name = f"{rel}_selected_on_{att}_{safe_op}_{val}"
     new_rel_path = f'../data/{new_rel_name}'
 
-    # Create a new directory for this relation
     os.makedirs(new_rel_path, exist_ok=True)
 
-    # Create a page pool for the new relation
     with open(f'../data/pagePool.txt', 'r') as page_pool_file:
         page_pool = json.load(page_pool_file)
 
-    # Create pageLink.txt for the new relation
     page_link = []
     page_count = 0
-
-    # Split the result into pages and write each page
     page_size = 2
     for i in range(0, len(result), page_size):
         page = result[i:i + page_size]
-        page_name = page_pool.pop(0)  # or however you want to name your pages
+        page_name = page_pool.pop(0)
         page_link.append(page_name)
         page_count += 1
 
         with open(os.path.join(new_rel_path, page_name), 'w') as page_file:
             json.dump(page, page_file)
 
-    # Write the page link information
     with open(os.path.join(new_rel_path, 'pageLink.txt'), 'w') as link_file:
         json.dump(page_link, link_file)
 
-    # Update the page pool
     with open(f'../data/pagePool.txt', 'w') as page_pool_file:
         json.dump(page_pool, page_pool_file)
 
-    # Read the current schemas from schemas.txt
     with open('../data/schemas.txt', 'r') as schema_file:
         schemas = json.load(schema_file)
 
-    # Append new schema info for the selected relation
     for attribute in schema_dict:
         schemas.append([new_rel_name, attribute, 'str', schema_dict[attribute]])
 
-    # Write the updated schemas back to schemas.txt
     with open('../data/schemas.txt', 'w') as schema_file:
         json.dump(schemas, schema_file)
+
+    # Save the result to queryOutput/queryResult.txt in append mode
+    with open('../queryOutput/queryResult.txt', 'a') as result_file:
+        result_file.write("\n\n")
+        result_file.write(json.dumps(result, indent=4))
+        result_file.write("\n\n")
 
     print(f"Select operation completed. Pages written: {page_count}")
     return new_rel_name
@@ -180,14 +178,14 @@ def project(rel, attList):
     with open('../data/schemas.txt', 'w') as schema_file:
         json.dump(schemas, schema_file)
 
-    # Save the result to queryOutput/queryResult.txt
-    with open('../queryOutput/queryResult.txt', 'w') as result_file:
-        json.dump(projected_data, result_file)
+    # Save the result to queryOutput/queryResult.txt in append mode
+    with open('../queryOutput/queryResult.txt', 'a') as result_file:
+        result_file.write("\n\n")
+        result_file.write(json.dumps(projected_data, indent=4))
+        result_file.write("\n\n")
 
     print(f"Projection operation completed. Pages written: {page_count}")
     return new_rel_name
-
-
 
 
 def join(rel1, att1, rel2, att2):
@@ -238,7 +236,8 @@ def join(rel1, att1, rel2, att2):
                                 # Check if the join condition is satisfied
                                 if record2[schema2[att2]] == record1[schema1[att1]]:
                                     # Combine records while avoiding attribute duplication
-                                    combined_record = record1 + [record2[i] for i in range(len(record2)) if i != schema2[att2]]
+                                    combined_record = record1 + [record2[i] for i in range(len(record2)) if
+                                                                 i != schema2[att2]]
                                     join_result.append(combined_record)
             else:
                 # Fallback to nested loop join if no B+ tree is found
@@ -288,17 +287,20 @@ def join(rel1, att1, rel2, att2):
     with open('../data/schemas.txt', 'r') as schema_file:
         schemas = json.load(schema_file)
 
-    # Append new schema info for the joined relation
-    for i, attribute in enumerate(list(schema1.keys()) + list(schema2.keys())):
+    # Append new schema info for the joined relation, avoiding duplication of the join attribute
+    combined_attributes = list(schema1.keys()) + [attr for attr in schema2.keys() if attr != att2]
+    for i, attribute in enumerate(combined_attributes):
         schemas.append([new_rel_name, attribute, 'str', i])  # Assuming all attributes are of type string
-
 
     with open('../data/schemas.txt', 'w') as schema_file:
         json.dump(schemas, schema_file)
 
-    # Save the result to queryOutput/queryResult.txt
-    with open('../queryOutput/queryResult.txt', 'w') as result_file:
-        json.dump(join_result, result_file)
+    # Save the result to queryOutput/queryResult.txt in append mode
+    with open('../queryOutput/queryResult.txt', 'a') as result_file:
+        result_file.write("\n\n")
+        result_file.write(json.dumps(join_result, indent=4))
+        result_file.write("\n\n")
+
 
     print(f"Join operation completed. Pages written: {page_count}")
     return new_rel_name

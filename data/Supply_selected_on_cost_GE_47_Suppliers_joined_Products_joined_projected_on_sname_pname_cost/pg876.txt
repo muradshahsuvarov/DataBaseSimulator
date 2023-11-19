@@ -1,0 +1,1 @@
+[["Hayley", "flashlight", 49.62], ["Hayley", "switch", 48.76]]

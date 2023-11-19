@@ -1,0 +1,1 @@
+[["s16", "p06", 49.66, "Newwll", "70 Eric Street", "air conditioner", "pink"], ["s18", "p10", 47.42, "Hayley", "21 Queens Road", "usb", "red"]]
