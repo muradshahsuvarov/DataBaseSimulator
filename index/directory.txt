@@ -3,5 +3,10 @@
         "Supply",
         "sid",
         "pg928.txt"
+    ],
+    [
+        "Supply",
+        "cost",
+        "pg803.txt"
     ]
 ]

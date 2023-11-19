@@ -1,0 +1,14 @@
+{
+    "name": "pg775.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 1,
+    "parent": "pg768.txt",
+    "body": [
+        {
+            "key": 45.47,
+            "left_child": "pg777.txt",
+            "right_child": "pg770.txt"
+        }
+    ]
+}

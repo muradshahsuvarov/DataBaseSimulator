@@ -1,0 +1,16 @@
+{
+    "name": "pg850.txt",
+    "type": "L",
+    "capacity": 2,
+    "current_keys": 1,
+    "parent": "pg848.txt",
+    "leftNode": "pg842.txt",
+    "rightNode": "pg849.txt",
+    "body": [
+        [
+            30.98,
+            "page07.txt",
+            1
+        ]
+    ]
+}

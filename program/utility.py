@@ -63,6 +63,7 @@ def traverse_bplus_tree(root, op, val, pages_read):
 
     # Traverse the tree to find relevant leaves
     while node:
+        print(node.name)
         pages_read += 1  # Increment page count when a new node is visited
         if node.type == 'L':
             # For leaf nodes, check if records satisfy the condition
@@ -88,8 +89,18 @@ def traverse_bplus_tree(root, op, val, pages_read):
                         break  # Stop if there is no appropriate sibling to traverse
                 else:
                     break  # Stop if the leaf is empty (should not normally happen)
-            elif op != '=' or key_found:
+            elif op == '=' and key_found:
                 break  # Stop if not searching for equality or key is found
+            elif op == '<' or op == '<=':
+                first_key_in_leaf = parse_key(node.body[0][0]) if node.body else None
+                if first_key_in_leaf is not None:
+                    node = node.leftNode
+                    continue
+            elif op == '>' or op == '>=':
+                first_key_in_leaf = parse_key(node.body[0][0]) if node.body else None
+                if first_key_in_leaf is not None:
+                    node = node.rightNode
+                    continue
             # For range queries, check adjacent nodes
             if op in ['<', '<='] and node.leftNode:
                 node = node.leftNode

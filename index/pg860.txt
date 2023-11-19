@@ -1,0 +1,19 @@
+{
+    "name": "pg860.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 2,
+    "parent": "pg761.txt",
+    "body": [
+        {
+            "key": 49.39,
+            "left_child": "pg868.txt",
+            "right_child": "pg862.txt"
+        },
+        {
+            "key": 49.55,
+            "left_child": "pg862.txt",
+            "right_child": "pg858.txt"
+        }
+    ]
+}

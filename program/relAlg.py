@@ -65,6 +65,9 @@ def select(rel, att, op, val):
         json.dump(result, file)
 
     result_relation_name = f"{rel}_selected_on_{att}_{op}_{val}"
+
+    print(f"Successfully saved the select result to {result_file_path}")
+
     return result_relation_name
 
 
@@ -101,6 +104,9 @@ def project(rel, attList):
         json.dump(projected_data, file)
 
     result_relation_name = f"{rel}_projected_on_{'_'.join(attList)}"
+
+    print(f"Successfully saved the projection result to {result_file_path}")
+
     return result_relation_name
 
 

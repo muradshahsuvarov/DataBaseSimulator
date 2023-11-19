@@ -1,0 +1,19 @@
+{
+    "name": "pg779.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 2,
+    "parent": "pg836.txt",
+    "body": [
+        {
+            "key": 28.27,
+            "left_child": "pg792.txt",
+            "right_child": "pg764.txt"
+        },
+        {
+            "key": 29.07,
+            "left_child": "pg792.txt",
+            "right_child": "pg780.txt"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "name": "pg792.txt",
+    "type": "L",
+    "capacity": 2,
+    "current_keys": 1,
+    "parent": "pg779.txt",
+    "leftNode": "pg832.txt",
+    "rightNode": "pg764.txt",
+    "body": [
+        [
+            27.98,
+            "page31.txt",
+            1
+        ]
+    ]
+}

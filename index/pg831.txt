@@ -1,0 +1,14 @@
+{
+    "name": "pg831.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 1,
+    "parent": "pg836.txt",
+    "body": [
+        {
+            "key": 27.7,
+            "left_child": "pg833.txt",
+            "right_child": "pg832.txt"
+        }
+    ]
+}

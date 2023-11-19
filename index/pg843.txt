@@ -1,0 +1,19 @@
+{
+    "name": "pg843.txt",
+    "type": "I",
+    "capacity": 2,
+    "current_keys": 2,
+    "parent": "pg828.txt",
+    "body": [
+        {
+            "key": 38.01,
+            "left_child": "pg845.txt",
+            "right_child": "pg753.txt"
+        },
+        {
+            "key": 41.62,
+            "left_child": "pg845.txt",
+            "right_child": "pg830.txt"
+        }
+    ]
+}
