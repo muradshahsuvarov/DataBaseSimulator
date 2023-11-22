@@ -23,13 +23,13 @@ if __name__ == '__main__':
     # relAlg.join("Suppliers", "sid", "Supply", "sid")
     # relAlg.select("Supply", "sid", "<", "s03")
 
-    # ---------------------TASK 8.a---------------------
+    # ---------------------Building a B Plus Tree---------------------
 
     #root = buildTree.build("Suppliers", "sid", 2)
     #display.displayTree("pg991.txt")
     #selected_supplier = relAlg.select(rel='Suppliers', att='sid', op='=', val='s23')
 
-    # ---------------------TASK 8.b---------------------
+    # ---------------------Remove the B Plus Tree---------------------
 
     #remove.removeTree("Suppliers", "sid")
     #selected_supplier = relAlg.select(rel='Suppliers', att='sid', op='==', val='s23')
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     # Step 3: Join the results to get the addresses of suppliers who supplied 'p15'
      #suppliers_who_supplied_p15 = relAlg.join(supplied_p15, 'sid', suppliers_addresses, 'sid')
 
-    # ---------------------TASK 8.d---------------------
+    # ---------------------Select on a couple of tables---------------------
 
     #suppliers_kiddie = relAlg.select('Suppliers', 'sname', '==', 'Kiddie')
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     #cost_result = relAlg.project(final_join, ['cost'])
 
-    # ---------------------TASK 8.e---------------------
+    # ---------------------Select and Join---------------------
 
     # Step 1: Select records from the Supply relation where cost >= 47
     #selected_supply = relAlg.select('Supply', 'cost', '>=', 47)
